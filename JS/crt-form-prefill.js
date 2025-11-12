@@ -1,1 +1,92 @@
-(()=>{const e=new class{_token;prefillServiceUrl;get token(){return this._token}init(){this._token=this.getURLParameter("crt_pref")}getURLParameter(e){return decodeURIComponent((RegExp("[?|&]"+e+"=(.+?)(&|$)","i").exec(location.search)||[,""])[1])}setFieldValues(e,t){e.querySelectorAll(".bee-field input").forEach((e=>{const n=t[e.name];e.value=n??""})),e.querySelectorAll(".bee-field select").forEach((e=>{const n=t[e.name];e.value=n??""}))}async getData(){const e=`${this.prefillServiceUrl}/api/prefill/get`;return fetch(e,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:this.token})}).then((e=>e.ok?e.json():e.text()))}};var t;t=async()=>{if(e.init(),!e.token)return;const t=Array.from(document.getElementsByTagName("form"));if(t.length<1)return;const n=await e.getData();n&&t.forEach((t=>e.setFieldValues(t,n)))},"loading"!==document.readyState?t():document.addEventListener("DOMContentLoaded",t),window.crtFormPrefill=e})();
+const crtFormPrefill = (() => {
+	class CrtFormPrefill {
+		_token;
+
+		/**
+		 * Form prefill service URL.
+		 * @returns {String}
+		 */
+		prefillServiceUrl;
+
+		/**
+		 * Form prefill token.
+		 * @returns {String}
+		 */
+		get token() {
+			return this._token;
+		}
+
+		/**
+		 * Initializes access token to get form prefill data.
+		 */
+		init() {
+			this._token = this.getURLParameter('crt_pref');
+		}
+
+		/**
+		 * Returns URL parameter by name.
+		 * @param {String} name Parameter name.
+		 * @return {String}
+		 */
+		getURLParameter(name) {
+			return decodeURIComponent(
+				(RegExp('[?|&]' + name + '=' + '(.+?)(&|$)', 'i').exec(location.search) || [, ""])[1]
+			);
+		}
+
+		/**
+		 * Sets field values in the form.
+		 * @param {Object} formEl Form element.
+		 * @param {Object} fieldValues Field values to set.
+		 */
+		setFieldValues(formEl, fieldValues) {
+			formEl.querySelectorAll('.bee-field input').forEach(field => {
+				let value = fieldValues[field.name];
+				if (field.type === 'date') {
+					const date = new Date(value);
+					value = date.toISOString().slice(0, 10);
+				}
+				field.value = value ?? '';
+			});
+			formEl.querySelectorAll('.bee-field select').forEach(field => {
+				const value = fieldValues[field.name];
+				field.value = value ?? '';
+			});
+		}
+
+		/**
+		 * Fetches form prefill data from the service.
+		 * @returns
+		 */
+		async getData() {
+			const requestUrl = `${this.prefillServiceUrl}/api/prefill/get`;
+			return fetch(requestUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ token: this.token })
+			}).then(response => response.ok ? response.json() : response.text());
+		};
+	}
+	return new CrtFormPrefill();
+})();
+
+const ready = fn => document.readyState !== 'loading' ? fn() : document.addEventListener('DOMContentLoaded', fn);
+
+ready(async () => {
+	crtFormPrefill.init();
+	if (!crtFormPrefill.token) {
+		return;
+	}
+	const pageForms = Array.from(document.getElementsByTagName('form'));
+	if (pageForms.length < 1) {
+		return;
+	}
+	const fieldValues = await crtFormPrefill.getData();
+	if (fieldValues) {
+		pageForms.forEach(f => crtFormPrefill.setFieldValues(f, fieldValues));
+	}
+});
+
+window.crtFormPrefill = crtFormPrefill;
