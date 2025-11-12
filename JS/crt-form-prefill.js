@@ -34,6 +34,10 @@ const crtFormPrefill = (() => {
 			);
 		}
 
+		notMinValue(value) {
+			return value !== '0001-01-01';
+		}
+
 		/**
 		 * Sets field values in the form.
 		 * @param {Object} formEl Form element.
@@ -44,7 +48,10 @@ const crtFormPrefill = (() => {
 				let value = fieldValues[field.name];
 				if (field.type === 'date') {
 					const date = new Date(value);
-					value = date.toISOString().slice(0, 10);
+					const formattedDate = date.toISOString().slice(0, 10);
+					if (notMinValue(formattedDate)) {
+						value = formattedDate;
+					}
 				}
 				field.value = value ?? '';
 			});
