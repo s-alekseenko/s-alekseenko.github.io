@@ -41,7 +41,11 @@ const crtFormPrefill = (() => {
 		 */
 		setFieldValues(formEl, fieldValues) {
 			formEl.querySelectorAll('.bee-field input').forEach(field => {
-				const value = fieldValues[field.name];
+					const value = fieldValues[field.name];
+				field.value = value ?? '';
+			});
+			formEl.querySelectorAll('.bee-field select').forEach(field => {
+					const value = fieldValues[field.name];
 				field.value = value ?? '';
 			});
 		}
