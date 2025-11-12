@@ -49,7 +49,7 @@ const crtFormPrefill = (() => {
 				if (field.type === 'date') {
 					const date = new Date(value);
 					const formattedDate = date.toISOString().slice(0, 10);
-					if (notMinValue(formattedDate)) {
+					if (this.notMinValue(formattedDate)) {
 						value = formattedDate;
 					}
 				}
